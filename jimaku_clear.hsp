@@ -5,17 +5,20 @@
 // ----------
 // 画面設定
 // ----------
-	screen 0, 200, 180, 4	// スクリーン初期化
+	screen 0, 200, 80, 4	// スクリーン初期化
 	gsel 0, 1	// 画面モード　とりあえずアクティブにする
-
+	title "jimaku_clear"
 
 // ----------
 // 各種変数
 // ----------
 	dim filedata, 24	// ファイル情報用変数
 	dim timestamp, 1	// タイムスタンプ記録用変数
-	dim jimaku_buf	// 空白用変数
-	dim gen_jikan, 2	// 現在時間取得用
+	dim jimaku_buf		// 空白用変数
+//	dim gen_jikan, 2	// 現在時間取得用
+	dim clear_check, 1	// 更新チェック済み変数
+	clear_check = 0		// 更新チェック済み変数　初期化
+
 
 // ----------
 // 起動時のみ一回
@@ -41,7 +44,6 @@
 	fxtget filedata, "jimaku.txt"	// jimaku.txt の各種情報取得
 
 
-
 // ----------
 // 処理本体
 // ----------
@@ -51,7 +53,7 @@
 
 	color 255, 255, 255	// 塗りつぶしの色（白）
 	boxf 0, 0, 200, 80	// 矩形で画面を塗りつぶす
-
+//	boxf 0, 0, // 矩形で画面を塗りつぶす
 
 	pos 10, 10
 	color 0, 0, 0	// 文字色
@@ -59,13 +61,16 @@
 	print ""+filedata(8)+"年"+filedata(9)+"月"+filedata(11)+"日"
 	print ""+filedata(12)+"時"+filedata(13)+"分"+filedata(14)+"秒"
 
+	print ""
+	print "同じ回数 "+kaisuu+"
+	print "違う回数 "+kaisuu2+"
 
 	// ボタン類
 	pos 125, 10
-	button "書き換え", *clear
+	button "書き換え", *clear_f
 
 	pos 125, 45
-	button "手動更新", *main
+	button "手動更新", *reload
 
 
 	redraw 1	// 描画開始
@@ -74,11 +79,19 @@
 
 	// 更新チェック
 	if timestamp(0) = filedata(12) & timestamp(1) = filedata(13) & timestamp(2) = filedata(14) {
-		mes "同じ"
+		print ""
+		print "同じ"
+		kaisuu ++
 		goto *clear
 	}
 	else {
-		mes "違う"
+		print ""
+		print "違う"
+		kaisuu2 ++
+		clear_check = 0
+		timestamp(0) = filedata(12)
+		timestamp(1) = filedata(13)
+		timestamp(2) = filedata(14)
 		goto *reload
 	}
 
@@ -102,25 +115,44 @@
 // ----------
 *clear
 
-
 	wait 500	// 5秒待機
 
 
-	jimaku_buf = " "	// 表示用空白
-//	jimaku_buf = ""+timestamp(0)+" "+timestamp(1)
-	nkfcnv jimaku_buf, jimaku_buf, "w",	// utf-8に変換
-
-	notesel jimaku_clear	// 変数作成
-	noteadd ""+jimaku_buf, 0, 1
-	notesave "jimaku.txt" // ファイルに書き込み
-
-	timestamp(0) = filedata(12)
-	timestamp(1) = filedata(13)
-	timestamp(3) = filedata(14)
+*clear_f
+	clear_check = 0
 
 
+	if clear_check = 0 {
+			jimaku_buf = " "	// 表示用空白
+//		jimaku_buf = ""+timestamp(0)+" "+timestamp(1)
+		nkfcnv jimaku_buf, jimaku_buf, "w",	// utf-8に変換
+		
+		notesel jimaku_clear	// 変数作成
+		noteadd ""+jimaku_buf, 0, 1
+		notesave "jimaku.txt" // ファイルに書き込み
 
-	goto *reload
+		fxtget filedata, "jimaku.txt"	// jimaku.txt の各種情報取得
+		timestamp(0) = filedata(12)
+		timestamp(1) = filedata(13)
+		timestamp(2) = filedata(14)
+
+		print "a"+clear_check
+		clear_check = 1
+			
+		goto *reload
+	}
+	else {
+		print "b"+clear_check
+		goto *reload
+
+	}
+
+
+
+
+
+
+
 
 
 
