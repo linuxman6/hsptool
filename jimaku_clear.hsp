@@ -1,0 +1,129 @@
+#include "hspext.as"	// ファイル情報取得用
+#include "hspinet.as"	// 文字コード変換用
+
+
+// ----------
+// 画面設定
+// ----------
+	screen 0, 200, 180, 4	// スクリーン初期化
+	gsel 0, 1	// 画面モード　とりあえずアクティブにする
+
+
+// ----------
+// 各種変数
+// ----------
+	dim filedata, 24	// ファイル情報用変数
+	dim timestamp, 1	// タイムスタンプ記録用変数
+	dim jimaku_buf	// 空白用変数
+	dim gen_jikan, 2	// 現在時間取得用
+
+// ----------
+// 起動時のみ一回
+// ----------
+
+	fxtget filedata, "jimaku.txt"	// jimaku.txt の各種情報取得
+
+	timestamp(0) = filedata(12)
+	timestamp(1) = filedata(13)
+	timestamp(2) = filedata(14)
+
+	goto *main
+
+
+// ----------
+// 自動更新
+// ----------
+*reload
+
+	wait 500	// 5秒待機
+
+
+	fxtget filedata, "jimaku.txt"	// jimaku.txt の各種情報取得
+
+
+
+// ----------
+// 処理本体
+// ----------
+*main
+
+	redraw 0	// 描画停止
+
+	color 255, 255, 255	// 塗りつぶしの色（白）
+	boxf 0, 0, 200, 80	// 矩形で画面を塗りつぶす
+
+
+	pos 10, 10
+	color 0, 0, 0	// 文字色
+	print "最終更新"
+	print ""+filedata(8)+"年"+filedata(9)+"月"+filedata(11)+"日"
+	print ""+filedata(12)+"時"+filedata(13)+"分"+filedata(14)+"秒"
+
+
+	// ボタン類
+	pos 125, 10
+	button "書き換え", *clear
+
+	pos 125, 45
+	button "手動更新", *main
+
+
+	redraw 1	// 描画開始
+
+
+
+	// 更新チェック
+	if timestamp(0) = filedata(12) & timestamp(1) = filedata(13) & timestamp(2) = filedata(14) {
+		mes "同じ"
+		goto *clear
+	}
+	else {
+		mes "違う"
+		goto *reload
+	}
+
+
+
+
+
+// return
+
+
+
+//	wait 500	// 5秒待機
+//	goto *reload
+
+
+
+
+
+// ----------
+// jimaku.txt を空にする
+// ----------
+*clear
+
+
+	wait 500	// 5秒待機
+
+
+	jimaku_buf = " "	// 表示用空白
+//	jimaku_buf = ""+timestamp(0)+" "+timestamp(1)
+	nkfcnv jimaku_buf, jimaku_buf, "w",	// utf-8に変換
+
+	notesel jimaku_clear	// 変数作成
+	noteadd ""+jimaku_buf, 0, 1
+	notesave "jimaku.txt" // ファイルに書き込み
+
+	timestamp(0) = filedata(12)
+	timestamp(1) = filedata(13)
+	timestamp(3) = filedata(14)
+
+
+
+	goto *reload
+
+
+
+
+
+
