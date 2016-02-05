@@ -4,7 +4,7 @@
 	screen 0, 64, 48, 1,
 	gsel 0, 2						; 最前面化
 
-	pos 4, 8
+	pos 22, 8
 	objsize 128, 32
 	button "２回コピー", *double_copy
 
