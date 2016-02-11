@@ -40,7 +40,6 @@
 
 	wait 500	// 5秒待機
 
-
 	fxtget filedata, "jimaku.txt"	// jimaku.txt の各種情報取得
 
 
@@ -67,6 +66,7 @@
 	print "同じ回数 "+kaisuu+"
 	print "違う回数 "+kaisuu2+"
 
+
 	// ボタン類
 	pos 125, 10
 	button "書き換え", *clear_f
@@ -74,9 +74,7 @@
 	pos 125, 45
 	button "手動更新", *reload
 
-
 	redraw 1	// 描画開始
-
 
 
 	// 更新チェック
@@ -98,32 +96,15 @@
 	}
 
 
-
-
-
-// return
-
-
-
-//	wait 500	// 5秒待機
-//	goto *reload
-
-
-
-
-
 // ----------
 // jimaku.txt を空にする
 // ----------
 *clear
-
 	wait 500	// 5秒待機
 
 
 *clear_f
-	clear_check = 0
-
-
+	if clear_check = 0 {
 
 	// ファイルサイズと存在確認
 	exist "jimaku.txt"
@@ -134,22 +115,17 @@
 //		end
 	}
 
-
 	// 更新前にもう一度タイムスタンプ確認
 	fxtget filedata, "jimaku.txt"	// jimaku.txt の各種情報取得
-	timestamp(0) = filedata(12)
-	timestamp(1) = filedata(13)
-	timestamp(2) = filedata(14)
-
 	if timestamp(0) = filedata(12) & timestamp(1) = filedata(13) & timestamp(2) = filedata(14) {
 	}
 	else {
-		wait 100
-		goto *clear_f
+		timestamp(0) = filedata(12)
+		timestamp(1) = filedata(13)
+		timestamp(2) = filedata(14)
+		goto *clear
 	}
 
-
-	if clear_check = 0 {
 			jimaku_buf = " "	// 表示用空白
 //		jimaku_buf = ""+timestamp(0)+" "+timestamp(1)
 		nkfcnv jimaku_buf, jimaku_buf, "w",	// utf-8に変換
@@ -173,16 +149,6 @@
 		goto *reload
 
 	}
-
-
-
-
-
-
-
-
-
-
 
 
 
