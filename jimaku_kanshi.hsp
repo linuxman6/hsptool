@@ -1,0 +1,76 @@
+#include "hspext.as"	// ファイル情報取得用
+#include "hspinet.as"	// 文字コード変換用
+
+
+
+// ----------
+// 画面設定
+// ----------
+	screen 0, 500, 36, 4	// スクリーン初期化
+	gsel 0, 1	// 画面モード　とりあえずアクティブにする
+	title "jimaku_kanshi"
+
+
+
+
+
+// ----------
+// 各種変数
+// ----------
+	dim filedata, 24	// ファイル情報用変数
+	dim timestamp, 1	// タイムスタンプ記録用変数
+	dim jimaku_text		// 字幕用バッファ
+	dim jimaku_buf		// 字幕用変数
+
+
+// ----------
+// 処理本体
+// ----------
+*main
+repeat
+
+	cls
+	clrobj
+
+
+	fxtget filedata, "jimaku.txt"	// jimaku.txt の各種情報取得
+	exist "jimaku.txt"	// ファイルサイズと存在確認
+	if strsize = -1 {
+		dialog "ファイルが見つかりません"
+		end
+	}
+
+	// 最終更新日時
+	kaisuu ++
+//	pos 10, 10
+	color 0, 0, 0	// 文字色
+	print ""+filedata(8)+"/"+filedata(9)+"/"+filedata(11)+" "+filedata(12)+":"+filedata(13)+":"+filedata(14)+"  "+kaisuu+"  "+strsize
+
+
+	// 字幕
+	notesel jimaku_buf	// note用変数に設定
+	noteload "jimaku.txt"
+	noteget jimaku_text,0	// 1行目のみ取得
+	nkfcnv jimaku_text, jimaku_text, "s",	// SJISに変換
+	print ""+jimaku_text
+	//print "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+
+
+
+
+
+
+	wait 100
+
+
+loop
+
+
+stop
+
+
+
+
+
+
+

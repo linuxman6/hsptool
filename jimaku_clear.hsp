@@ -124,12 +124,28 @@
 	clear_check = 0
 
 
-	exist "jimaku.txt"	// ファイルサイズと存在確認
+
+	// ファイルサイズと存在確認
+	exist "jimaku.txt"
 	if strsize = -1 {
-		wait 500
-		goto *clear_f
-//		dialog "ファイルが見つかりません"
+//		wait 500
+		dialog "ファイルが見つかりません"
+		goto *clear
 //		end
+	}
+
+
+	// 更新前にもう一度タイムスタンプ確認
+	fxtget filedata, "jimaku.txt"	// jimaku.txt の各種情報取得
+	timestamp(0) = filedata(12)
+	timestamp(1) = filedata(13)
+	timestamp(2) = filedata(14)
+
+	if timestamp(0) = filedata(12) & timestamp(1) = filedata(13) & timestamp(2) = filedata(14) {
+	}
+	else {
+		wait 100
+		goto *clear_f
 	}
 
 
