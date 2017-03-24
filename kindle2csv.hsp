@@ -1,0 +1,105 @@
+#include "hspext.as"	;クリップボード操作用
+
+;初期設定
+
+	;ウィンドウ
+	screen 0, 640, 480
+
+	;フォント
+	font "MeiryoKe_Console", 14
+	objmode 2
+
+
+	sdim ouoput, 10000
+	sdim output_temp, 1000
+	output = ""
+	output_temp = ""
+
+
+
+//メイン
+
+	sdim clipboard_in, 100000
+	clipget clipboard_in, 100000	;クリップボードからデータ取得
+
+
+	notesel clipboard_note	;メモリノート選択
+	noteadd clipboard_in	;メモリノートにクリップボードの内容を入れる
+
+
+	repeat notemax	;メモリノートの行数回繰り返し
+
+		notesel clipboard_note
+		noteget note_temp, cnt
+		kensaku = instr(note_temp, 0, "201")
+
+		if kensaku = 0 {
+			kensaku_cnt = cnt
+			gosub *seikei
+			mes ""+kensaku_cnt+" "+output
+		}
+	loop
+
+
+//------
+
+	sdim clipboard_out, 10000
+	sdim clipboard_out_t, 10000
+	notesel clipboard_note_out
+	noteget clipboard_out_t, 0
+	clipboard_out = clipboard_out_t
+
+	kuri = notemax
+	repeat kuri
+
+
+		noteget clipboard_out_t, cnt+1
+		clipboard_out = clipboard_out + "\n" + clipboard_out_t
+
+
+	loop
+
+	clipset clipboard_out
+
+
+end
+
+
+
+
+
+
+//整形処理
+*seikei
+
+	notesel clipboard_note
+
+	noteget output_temp ,kensaku_cnt - 2	//タイトル
+	output = output_temp
+
+	noteget output_temp ,kensaku_cnt - 1	//著者
+	output = output + "\t" + output_temp
+
+	output = output + "\t\t"	//空白
+
+	noteget output_temp ,kensaku_cnt + 0	//購入日
+	output = output + "\t" + output_temp
+
+	notesel clipboard_note_out
+	noteadd output, -1, 0
+
+
+
+
+return
+
+
+
+
+
+
+
+
+
+
+
